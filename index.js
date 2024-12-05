@@ -35,8 +35,9 @@ app.get("/produto/:id",(request, response)=>{
     response.json(db.listaProduto2(id));
 });
 
-app.get("/produto",(request, response)=>{
-    response.json(db.listaProduto1());
+app.get("/produto", async(request, response)=>{
+    response.json(db.listaProduto1());                                  
+    response.json(resultado)
 });
 
 // criação da rota ou endpoint principal ou raiz com a função definindo o que será feito.
