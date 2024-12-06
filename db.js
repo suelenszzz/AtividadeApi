@@ -1,49 +1,40 @@
-/* "Banco de dados" em memória
-const produto = [
-    { id: 1, nome: 'Produto 1', quantidade: 10, preco: 100.00 },
-    { id: 2, nome: 'Produto 2', quantidade: 5, preco: 50.00 },
-];*/
-
-//Criando uma função .  padrão básico: function nome_da_funcao(){ return dado_a_ser_retornado}
-async function listaProduto1(){
-    const resultado= await conexao.query("SELECT * FROM produto1")
-    return resultado[0];
-}
-
-//Criando uma função .  padrão básico: function nome_da_funcao(){ return dado_a_ser_retornado}
-function listaProduto2(id){
-return produto.find(c => c.id == id);
-}
-//função para inserir um cliente novo
-function insereProduto(produto){
-produto.push(produto);
-}
-
-function alteraProduto(id,dadosproduto){
-const produtonovo =  produto.find(c => c.id == id);
-if (produtonovo){
-produtonovo.nome =  dadosproduto.nome;
-produtonovo.quantidade = dadosproduto.quantidade;
-produtonovo.preco = dadosproduto.preco;
-} else {
-    return("Deu ruim!");
-}    
-}
-
-function removeProduto(id){
-const indice = produto.findIndex(c => c.id == id);
-produto.splice(indice,1);
-}
-
 const mysql = require("mysql2/promise");
 
 
 const conexao = mysql.createPool(process.env.CONNECTION_STRING);
 
+async function listaProdutos(){
+    const resultado= await conexao.query("SELECT * FROM produto")
+    return resultado[0];
+}
+
+async function listaProduto(id){
+    const resultado = await conexao.query("SELECT * FROM produto WHERE id=?;",[id]);
+    return resultado[0];
+}
+
+function insereProduto(produto){
+    const valores = [produto.nome, produto.quantidade, produto.preco]
+    conexao.query("INSERT INTO produto(nome,quantidade,preco) VALUES (?,?);",valores);
+  
+}
+
+async function alteraProduto(id,dadosproduto){
+    const valores = [dadosproduto.nome, dadosproduto.quantidade, id];
+    await conexao.query("UPDATE produto SET nome=?,quantidade=?,preco=?, WHERE id=?",valores);
+
+}
+
+
+async function removeProduto(id){
+    const valores = [id];
+    await conexao.query("DELETE FROM produto WHERE id=?",valores);
+}
+
 //comando para que a função seja acessivel de fora do arquivo db.js
 module.exports = {
-listaProduto1,
-listaProduto2,
+listaProduto,
+listaProdutos,
 insereProduto,
 alteraProduto,
 removeProduto
